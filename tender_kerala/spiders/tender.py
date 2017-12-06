@@ -32,7 +32,7 @@ class TenderSpider(scrapy.Spider):
                 #Insert values
                 if publish_date:
                     #cur.execute("INSERT INTO tender_details (e_published_date,bid_submission_closing_date,tender_opening_date,title,reference_no,tender_id,organisation_chain) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s')" % (publish_date[0], closing_date[0], opening_date[0], title[0], tender_details[1], tender_details[3], organisation));
-                    cur.execute("INSERT INTO tender_details (e_published_date,bid_submission_closing_date,tender_opening_date,title,reference_no,tender_id,organisation_chain) SELECT * FROM (SELECT '%s', '%s', '%s', '%s', '%s', '%s', '%s') AS tmp WHERE NOT EXISTS ( SELECT tender_id FROM tender_details WHERE tender_id = '%s')" % (publish_date[0], closing_date[0], opening_date[0], title[0], tender_details[1], tender_details[3], organisation, tender_details[3]));
+                    cur.execute("INSERT INTO tender_details (e_published_date,bid_submission_closing_date,tender_opening_date,title,reference_no,tender_id,organisation_chain) SELECT * FROM (SELECT '%s', '%s', '%s', '%s', '%s', '%s', '%s') AS tmp WHERE NOT EXISTS ( SELECT tender_id FROM tender_details WHERE tender_id = '%s') LIMIT 1" % (publish_date[0], closing_date[0], opening_date[0], title[0], tender_details[1], tender_details[3], organisation, tender_details[3]));
 
             count += 1
         conn.commit()
