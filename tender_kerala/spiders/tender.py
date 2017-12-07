@@ -25,14 +25,14 @@ class TenderSpider(scrapy.Spider):
                 closing_date = tender.xpath('td[3]/text()').extract()
                 opening_date =  tender.xpath('td[4]/text()').extract()
                 title = tender.xpath('td[5]/a/text()').extract()
-                #title = re.split(r'\[|\]', title)
+                if title:
+                    title = re.split(r'\[|\]', title[0])
                 tender_details = '\t'.join(tender.xpath('td[5]/text()').extract()).strip()
                 tender_details = re.split(r'\[|\]', tender_details)
                 organisation = '\t'.join(tender.xpath('td[6]/text()').extract()).strip()
-                #Insert values
-                if publish_date:
-                    #cur.execute("INSERT INTO tender_details (e_published_date,bid_submission_closing_date,tender_opening_date,title,reference_no,tender_id,organisation_chain) VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s')" % (publish_date[0], closing_date[0], opening_date[0], title[0], tender_details[1], tender_details[3], organisation));
-                    cur.execute("INSERT INTO tender_details (e_published_date,bid_submission_closing_date,tender_opening_date,title,reference_no,tender_id,organisation_chain) SELECT * FROM (SELECT '%s', '%s', '%s', '%s', '%s', '%s', '%s') AS tmp WHERE NOT EXISTS ( SELECT tender_id FROM tender_details WHERE tender_id = '%s') LIMIT 1" % (publish_date[0], closing_date[0], opening_date[0], title[0], tender_details[1], tender_details[3], organisation, tender_details[3]));
+                #Create values
+                if publish_date and closing_date and opening_date and tender_details and title:
+                    cur.execute("INSERT INTO tender_details (e_published_date,bid_submission_closing_date,tender_opening_date,title,reference_no,tender_id,organisation_chain) SELECT * FROM (SELECT '%s', '%s', '%s', '%s', '%s', '%s', '%s') AS tmp WHERE NOT EXISTS ( SELECT tender_id FROM tender_details WHERE tender_id = '%s') LIMIT 1" % (publish_date[0], closing_date[0], opening_date[0], title[1], tender_details[1], tender_details[3], organisation, tender_details[3]));
 
             count += 1
         conn.commit()
@@ -44,5 +44,5 @@ class TenderSpider(scrapy.Spider):
             next_page = response.urljoin(next_page)
             yield scrapy.Request(next_page, callback=self.parse)
         page_count += 1
-        #conn.close()
-            
+
+
