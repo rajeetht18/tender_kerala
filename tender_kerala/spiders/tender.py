@@ -39,7 +39,6 @@ class TenderSpider(scrapy.Spider):
 
         next_page = response.css('span[id=informal_11] a[id=linkFwd]::attr(href)').extract_first()
         print page_count,' page_count'
-        #print allowed_domains[0] + next_page,' Link'
         if next_page is not None:
             next_page = response.urljoin(next_page)
             yield scrapy.Request(next_page, callback=self.parse)
